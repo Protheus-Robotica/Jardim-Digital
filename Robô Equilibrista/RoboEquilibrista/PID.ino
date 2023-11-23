@@ -1,17 +1,22 @@
-double kp = 40; //1,9
-double kd = 0.6; //1,16
-double ki = 0.05; //2,17
+double kp = 5.0; //35
+double kd = 15.0; //0.7
+double ki = 10.0; // 0.01
 
-int OUTMAX = 170;
-int OUTMIN = -170;
+int OUTMAX = 255;
+int OUTMIN = -255;
 
 
 
-double SetPoint = -16.2;
+double SetPoint = -14.5; // -14.5
 
 float lastInput = 0.0;
 
 double ITerm = 0.0;
+
+const double IMax = 100.0;
+const double IMin = -100.0;
+
+uint16_t lastTime = 0;
 
 double Compute(double input){
 
@@ -19,13 +24,17 @@ double Compute(double input){
 
   ITerm += (ki*erro);
 
-  if(ITerm > OUTMAX){
-    ITerm = OUTMAX;
+  if(ITerm > IMax){
+    ITerm = IMax;
   }else if(ITerm <= OUTMIN){
-    ITerm = OUTMIN;
+    ITerm = IMax;
   }
 
-  double dInput = input - lastInput;
+
+  uint16_t dt = millis() - lastTime;
+  lastTime = millis();
+
+  double dInput = (input - lastInput) / dt;
 
   double output = kp*erro + ITerm + kd*dInput;
 
